@@ -17,52 +17,58 @@ o run this program, you can use Remix, an online Solidity IDE. To get started, g
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
-contract Marketplace {
+contract MarketplaceApp {
 
     struct Item {
         string name;
-        uint256 price;
-        address seller;
+        string description;
+        bool exists;
     }
-
     struct User {
         string username;
-        bool isRegistered;
+        bool registered;  
+    }
+    
+    // User Functionality
+
+    mapping(address => User) users;
+
+    function registerUser(string memory username, address _addr) public returns(string memory) {
+        if(users[_addr].registered) revert("Already registered");
+
+        users[_addr] = User(username, true);
+        return string(abi.encodePacked(username, " successfully registered"));
     }
 
-    mapping(address => User) public users;
-    mapping(uint256 => Item) public items;
-    uint256 public itemCount;
+    // Item Functionality
 
-    event UserRegistered(address indexed userAddress, string username);
-    event ItemListed(uint256 indexed itemId, string name, uint256 price, address indexed seller);
+    mapping(address => Item) items;
 
-    // Function to register a new user
-    function registerUser(string memory username) public {
-        require(!users[msg.sender].isRegistered, "User already registered");
-        
-        users[msg.sender] = User(username, true);
-        
-        emit UserRegistered(msg.sender, username);
+    function listItem(string memory name, string memory description, address _user) public {
+        assert(users[_user].registered);
+        items[_user] = Item(name, description, true);
     }
 
-    // Function to list a new item for sale
-    function listItem(string memory name, uint256 price) public {
-        require(users[msg.sender].isRegistered, "User not registered");
-        require(price > 0, "Price must be greater than zero");
-        
-        itemCount++;
-        items[itemCount] = Item(name, price, msg.sender);
-        
-        emit ItemListed(itemCount, name, price, msg.sender);
+    function viewItem(address _user) public view returns(Item memory) {
+        if(!items[_user].exists) revert("Item doesn't exist");
+        return items[_user];
     }
 
-    // Function to get details of an item by its ID
-    function getItem(uint256 itemId) public view returns (Item memory) {
-        require(itemId > 0 && itemId <= itemCount, "Item does not exist");
-        return items[itemId];
+    // Admin Functionality
+
+    address admin;
+
+    constructor() {
+        admin = msg.sender;
+    }
+
+    function deleteItem(address _user, address _adminAddr) public {
+        require(admin == _adminAddr, "Unauthorized");
+        items[_user].exists = false;
     }
 }
+//0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db
+//0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
 ```
 To compile the code, click on the "Solidity Compiler" tab in the left-hand sidebar. Make sure the "Compiler" option is set to "0.8.26" (or another compatible version), and then click on the "Compile myContact.sol" button.
 
