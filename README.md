@@ -2,6 +2,11 @@
 
 This is a simple Marketplace smart contract written in Solidity. It allows users to register, list items for sale, and view item details.
 
+## Video Tutorial
+
+For a detailed walkthrough of the code and how the project works, check out the [Loom video](https://www.loom.com/share/b1beb1d2f330419b8ef7d1f23bf90a04?sid=bde46e35-4d23-4993-a289-af79270d26f5).
+
+
 ## Features
 
 - **User Registration:** Users can register with a unique username.
